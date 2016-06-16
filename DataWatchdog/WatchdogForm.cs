@@ -22,7 +22,6 @@ namespace DataWatchdog
             InitializeComponent();
             autoRebootMenuItem.Checked = Properties.Settings.Default.AutoReboot;
             autoLaunchMenuItem.Checked = _registryKey.GetValue("DataWatchdog") != null;
-            VerifyOrInit();
         }
 
         private void exitMenuItem_Click(object sender, EventArgs e)
@@ -49,6 +48,7 @@ namespace DataWatchdog
         private void WatchdogForm_Load(object sender, EventArgs e)
         {
             Hide();
+            VerifyOrInit();
         }
 
         private void autoLaunchMenuItem_Click(object sender, EventArgs e)
@@ -72,20 +72,49 @@ namespace DataWatchdog
             var fixedOnly = Properties.Settings.Default.FixedOnly;
             // Verify or init watcher folders
             var driverList = RetrieveDrives(fixedOnly);
-            foreach (var driveName in driverList.Where(driveName => !VerifyOrdInitWatchFolder(driveName, reset)))
+            if (reset)
+            {
+                foreach (var watcher in _watchers)
+                {
+                    watcher.EnableRaisingEvents = false;
+                    watcher.Dispose();
+                }
+                _watchers.Clear();
+                foreach (var watchFolder in driverList.Select(driveName => new DirectoryInfo(driveName + _decoyFolderName)).Where(watchFolder => watchFolder.Exists))
+                {
+                    SetAttributesNormal(watchFolder);
+                    watchFolder.Delete(true);
+                }
+            }
+            foreach (var driveName in driverList.Where(driveName => !VerifyOrdInitWatchFolder(driveName)))
             {
                 SoundAlarm(driveName);
             }
             // Init folder watcher
             foreach (var driveName in driverList)
             {
-                var watcher = new FileSystemWatcher(driveName + _decoyFolderName);
-                watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Size;
+                var watcher = new FileSystemWatcher(driveName + _decoyFolderName)
+                {
+                    SynchronizingObject = this,
+                    NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Size
+                };
                 watcher.Created += WatcherEventHandler;
                 watcher.Renamed += WatcherEventHandler;
                 watcher.Changed += WatcherEventHandler;
                 watcher.EnableRaisingEvents = true;
                 _watchers.Add(watcher);
+            }
+        }
+
+        private void SetAttributesNormal(DirectoryInfo dir)
+        {
+            foreach (var directoryInfo in dir.GetDirectories())
+            {
+                SetAttributesNormal(directoryInfo);
+            }
+            foreach (var fileInfo in dir.GetFiles())
+            {
+                fileInfo.Attributes = FileAttributes.Normal;
             }
         }
 
@@ -100,37 +129,35 @@ namespace DataWatchdog
         {
             if (autoRebootMenuItem.Checked)
             {
-                ShowNotification($"{target} is infected! Computer will reboot after 10 secs!", false);
+                ShowNotification($"{target} is infected!\r\nComputer will reboot after 10 secs!", false);
                 Reboot(10);
             }
             else
             {
-                ShowNotification($"{target} is infected! Press \"Reboot\" to reboot!");
+                ShowNotification($"{target} is infected!\r\nPress \"Reboot\" to reboot!");
             }
         }
 
-        private bool VerifyOrdInitWatchFolder(string driveName, bool reset)
+        private bool VerifyOrdInitWatchFolder(string driveName)
         {
             var watchFolder = new DirectoryInfo(driveName + _decoyFolderName);
             if (watchFolder.Exists)
             {
                 try
                 {
-                    if (reset)
+                    var files = watchFolder.GetFiles();
+                    // check file number
+                    if (files.Length != 1) return false;
+                    // check filename
+                    if (!files[0].Name.Equals(_decoyFilename)) return false;
+                    // check file content
+                    var content = "";
+                    using (var sr = files[0].OpenText())
                     {
-                        watchFolder.Delete(true);
+                        content = sr.ReadLine();
+                        sr.Close();
                     }
-                    else
-                    {
-                        var files = watchFolder.GetFiles();
-                        // check file number
-                        if (files.Length != 1) return false;
-                        // check filename
-                        if (!files[0].Name.Equals(_decoyFilename)) return false;
-                        // check file content
-                        if (!files[0].OpenText().ReadLine().Equals(_decoyContent)) return false;
-                        return true;
-                    }
+                    return content.Equals(_decoyContent);
                 }
                 catch (Exception e)
                 {

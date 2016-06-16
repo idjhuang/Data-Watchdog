@@ -32,16 +32,16 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WatchdogForm));
             this.trayIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.autoLaunchMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.autoRebootMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.resetMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.autoRebootMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pictureBox = new System.Windows.Forms.PictureBox();
             this.notifyMessage = new System.Windows.Forms.Label();
             this.closeNotifyBtn = new System.Windows.Forms.Button();
             this.rebootBtn = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.autoLaunchMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.SuspendLayout();
@@ -62,7 +62,26 @@
             this.resetMenuItem,
             this.exitMenuItem});
             this.contextMenuStrip.Name = "contextMenuStrip";
-            this.contextMenuStrip.Size = new System.Drawing.Size(182, 120);
+            this.contextMenuStrip.Size = new System.Drawing.Size(182, 98);
+            // 
+            // autoLaunchMenuItem
+            // 
+            this.autoLaunchMenuItem.Name = "autoLaunchMenuItem";
+            this.autoLaunchMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.autoLaunchMenuItem.Text = "Start with Windows";
+            this.autoLaunchMenuItem.Click += new System.EventHandler(this.autoLaunchMenuItem_Click);
+            // 
+            // autoRebootMenuItem
+            // 
+            this.autoRebootMenuItem.Name = "autoRebootMenuItem";
+            this.autoRebootMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.autoRebootMenuItem.Text = "Auto Reboot";
+            this.autoRebootMenuItem.Click += new System.EventHandler(this.autoShutdownMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(178, 6);
             // 
             // resetMenuItem
             // 
@@ -77,18 +96,6 @@
             this.exitMenuItem.Size = new System.Drawing.Size(181, 22);
             this.exitMenuItem.Text = "Exit";
             this.exitMenuItem.Click += new System.EventHandler(this.exitMenuItem_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(178, 6);
-            // 
-            // autoRebootMenuItem
-            // 
-            this.autoRebootMenuItem.Name = "autoRebootMenuItem";
-            this.autoRebootMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.autoRebootMenuItem.Text = "Auto Reboot";
-            this.autoRebootMenuItem.Click += new System.EventHandler(this.autoShutdownMenuItem_Click);
             // 
             // pictureBox
             // 
@@ -139,13 +146,6 @@
             this.label1.TabIndex = 5;
             this.label1.Text = "Data Watchdog";
             // 
-            // autoLaunchMenuItem
-            // 
-            this.autoLaunchMenuItem.Name = "autoLaunchMenuItem";
-            this.autoLaunchMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.autoLaunchMenuItem.Text = "Start with Windows";
-            this.autoLaunchMenuItem.Click += new System.EventHandler(this.autoLaunchMenuItem_Click);
-            // 
             // WatchdogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -157,6 +157,7 @@
             this.Controls.Add(this.notifyMessage);
             this.Controls.Add(this.pictureBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "WatchdogForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
