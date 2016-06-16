@@ -21,6 +21,7 @@ namespace DataWatchdog
         {
             InitializeComponent();
             autoRebootMenuItem.Checked = Properties.Settings.Default.AutoReboot;
+            includeRemovableMenuItem.Checked = !Properties.Settings.Default.FixedOnly;
             autoLaunchMenuItem.Checked = _registryKey.GetValue("DataWatchdog") != null;
         }
 
@@ -64,6 +65,13 @@ namespace DataWatchdog
         {
             autoRebootMenuItem.Checked = !autoRebootMenuItem.Checked;
             Properties.Settings.Default.AutoReboot = autoRebootMenuItem.Checked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void includeRemovableMenuItem_Click(object sender, EventArgs e)
+        {
+            includeRemovableMenuItem.Checked = !includeRemovableMenuItem.Checked;
+            Properties.Settings.Default.FixedOnly = !includeRemovableMenuItem.Checked;
             Properties.Settings.Default.Save();
         }
 

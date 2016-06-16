@@ -42,6 +42,7 @@
             this.closeNotifyBtn = new System.Windows.Forms.Button();
             this.rebootBtn = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.includeRemovableMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.SuspendLayout();
@@ -57,43 +58,44 @@
             // 
             this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.autoLaunchMenuItem,
+            this.includeRemovableMenuItem,
             this.autoRebootMenuItem,
             this.toolStripSeparator1,
             this.resetMenuItem,
             this.exitMenuItem});
             this.contextMenuStrip.Name = "contextMenuStrip";
-            this.contextMenuStrip.Size = new System.Drawing.Size(182, 98);
+            this.contextMenuStrip.Size = new System.Drawing.Size(184, 142);
             // 
             // autoLaunchMenuItem
             // 
             this.autoLaunchMenuItem.Name = "autoLaunchMenuItem";
-            this.autoLaunchMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.autoLaunchMenuItem.Size = new System.Drawing.Size(183, 22);
             this.autoLaunchMenuItem.Text = "Start with Windows";
             this.autoLaunchMenuItem.Click += new System.EventHandler(this.autoLaunchMenuItem_Click);
             // 
             // autoRebootMenuItem
             // 
             this.autoRebootMenuItem.Name = "autoRebootMenuItem";
-            this.autoRebootMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.autoRebootMenuItem.Size = new System.Drawing.Size(183, 22);
             this.autoRebootMenuItem.Text = "Auto Reboot";
             this.autoRebootMenuItem.Click += new System.EventHandler(this.autoShutdownMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(178, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(180, 6);
             // 
             // resetMenuItem
             // 
             this.resetMenuItem.Name = "resetMenuItem";
-            this.resetMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.resetMenuItem.Size = new System.Drawing.Size(183, 22);
             this.resetMenuItem.Text = "Reset";
             this.resetMenuItem.Click += new System.EventHandler(this.resetMenuItem_Click);
             // 
             // exitMenuItem
             // 
             this.exitMenuItem.Name = "exitMenuItem";
-            this.exitMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.exitMenuItem.Size = new System.Drawing.Size(183, 22);
             this.exitMenuItem.Text = "Exit";
             this.exitMenuItem.Click += new System.EventHandler(this.exitMenuItem_Click);
             // 
@@ -146,6 +148,13 @@
             this.label1.TabIndex = 5;
             this.label1.Text = "Data Watchdog";
             // 
+            // includeRemovableMenuItem
+            // 
+            this.includeRemovableMenuItem.Name = "includeRemovableMenuItem";
+            this.includeRemovableMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.includeRemovableMenuItem.Text = "Include Removable";
+            this.includeRemovableMenuItem.Click += new System.EventHandler(this.includeRemovableMenuItem_Click);
+            // 
             // WatchdogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -186,6 +195,7 @@
         private System.Windows.Forms.ToolStripMenuItem autoRebootMenuItem;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ToolStripMenuItem autoLaunchMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem includeRemovableMenuItem;
     }
 }
 

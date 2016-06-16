@@ -23,12 +23,15 @@ namespace DataWatchdog.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool FixedOnly {
             get {
                 return ((bool)(this["FixedOnly"]));
+            }
+            set {
+                this["FixedOnly"] = value;
             }
         }
         

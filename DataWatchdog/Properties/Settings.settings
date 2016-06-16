@@ -2,7 +2,7 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DataWatchdog.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="FixedOnly" Type="System.Boolean" Scope="Application">
+    <Setting Name="FixedOnly" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="FolderName" Type="System.String" Scope="Application">
