@@ -62,12 +62,12 @@ namespace DataWatchdog.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool AutoShutdown {
+        public bool AutoReboot {
             get {
-                return ((bool)(this["AutoShutdown"]));
+                return ((bool)(this["AutoReboot"]));
             }
             set {
-                this["AutoShutdown"] = value;
+                this["AutoReboot"] = value;
             }
         }
     }

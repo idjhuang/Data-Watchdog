@@ -2,17 +2,26 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Management;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace DataWatchdog
 {
     public partial class WatchdogForm : Form
     {
+        private RegistryKey _registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+        private string _decoyFolderName = Properties.Settings.Default.FolderName;
+        private string _decoyFilename = Properties.Settings.Default.Filename;
+        private string _decoyContent = Properties.Settings.Default.Content;
+        private List<FileSystemWatcher> _watchers = new List<FileSystemWatcher>();
+
         public WatchdogForm()
         {
             InitializeComponent();
-            autoShutdownMenuItem.Checked = Properties.Settings.Default.AutoShutdown;
+            autoRebootMenuItem.Checked = Properties.Settings.Default.AutoReboot;
+            autoLaunchMenuItem.Checked = _registryKey.GetValue("DataWatchdog") != null;
             VerifyOrInit();
         }
 
@@ -26,9 +35,9 @@ namespace DataWatchdog
             Reset();
         }
 
-        private void shutdownBtn_Click(object sender, EventArgs e)
+        private void rebootBtn_Click(object sender, EventArgs e)
         {
-            Shutdown();
+            Reboot();
             Hide();
         }
 
@@ -42,28 +51,30 @@ namespace DataWatchdog
             Hide();
         }
 
-        private void autoShutdownMenuItem_Click(object sender, EventArgs e)
+        private void autoLaunchMenuItem_Click(object sender, EventArgs e)
         {
-            autoShutdownMenuItem.Checked = !autoShutdownMenuItem.Checked;
-            Properties.Settings.Default.AutoShutdown = autoShutdownMenuItem.Checked;
-            Properties.Settings.Default.Save();
+            autoLaunchMenuItem.Checked = !autoLaunchMenuItem.Checked;
+            if (autoLaunchMenuItem.Checked)
+                _registryKey.SetValue("DataWatchdog", Application.ExecutablePath);
+            else
+                _registryKey.DeleteValue("DataWatchdog", false);
         }
 
-        private string _decoyFolderName = Properties.Settings.Default.FolderName;
-        private string _decoyFilename = Properties.Settings.Default.Filename;
-        private string _decoyContent = Properties.Settings.Default.Content;
-        private List<FileSystemWatcher> _watchers = new List<FileSystemWatcher>();
+        private void autoShutdownMenuItem_Click(object sender, EventArgs e)
+        {
+            autoRebootMenuItem.Checked = !autoRebootMenuItem.Checked;
+            Properties.Settings.Default.AutoReboot = autoRebootMenuItem.Checked;
+            Properties.Settings.Default.Save();
+        }
 
         private void VerifyOrInit(bool reset = false)
         {
             var fixedOnly = Properties.Settings.Default.FixedOnly;
             // Verify or init watcher folders
             var driverList = RetrieveDrives(fixedOnly);
-            foreach (var driveName in driverList)
+            foreach (var driveName in driverList.Where(driveName => !VerifyOrdInitWatchFolder(driveName, reset)))
             {
-                if (!VerifyOrdInitWatchFolder(driveName, reset))
-                    MessageBox.Show(string.Format("{0} not valid!", driveName), "Watch Dog", MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
+                SoundAlarm(driveName);
             }
             // Init folder watcher
             foreach (var driveName in driverList)
@@ -82,7 +93,20 @@ namespace DataWatchdog
         {
             // Sound the alarm
             var target = fileSystemEventArgs.FullPath;
-            MessageBox.Show($"Alarm on {target}", "Watch Dog", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            SoundAlarm(target);
+        }
+
+        private void SoundAlarm(string target)
+        {
+            if (autoRebootMenuItem.Checked)
+            {
+                ShowNotification($"{target} is infected! Computer will reboot after 10 secs!", false);
+                Reboot(10);
+            }
+            else
+            {
+                ShowNotification($"{target} is infected! Press \"Reboot\" to reboot!");
+            }
         }
 
         private bool VerifyOrdInitWatchFolder(string driveName, bool reset)
@@ -108,9 +132,11 @@ namespace DataWatchdog
                         return true;
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    return false;
+                    MessageBox.Show($"Verify {driveName} failure: {e.Message}", "Data Watchdog", MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return true;
                 }
             }
             // init watch folder
@@ -127,9 +153,11 @@ namespace DataWatchdog
                     sw.Close();
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return false;
+                MessageBox.Show($"Init {driveName} failure: {e.Message}", "Data Watchdog", MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return true;
             }
             return true;
         }
@@ -213,21 +241,20 @@ namespace DataWatchdog
             return retVal;
         }
 
-        private void ShowNotification(string message, bool showShutdown = true, bool autoShutdown = false)
+        private void ShowNotification(string message, bool showReboot = true)
         {
             notifyMessage.Text = message;
-            shutdownBtn.Visible = showShutdown;
+            rebootBtn.Visible = showReboot;
             var screen = Screen.AllScreens[0];
             Show();
             this.WindowState = FormWindowState.Normal;
             Left = screen.WorkingArea.Right - Width;
             Top = screen.WorkingArea.Bottom - Height;
-            if (autoShutdown) Shutdown();
         }
 
-        private void Shutdown()
+        private void Reboot(int delay = 0)
         {
-            var psi = new ProcessStartInfo("shutdown", "/s /t 0");
+            var psi = new ProcessStartInfo("shutdown", $"/r /t {delay}");
             psi.CreateNoWindow = true;
             psi.UseShellExecute = false;
             Process.Start(psi);
@@ -235,7 +262,7 @@ namespace DataWatchdog
 
         private void Reset()
         {
-            ShowNotification("This is a test message!");
+            VerifyOrInit(true);
         }
     }
 }
