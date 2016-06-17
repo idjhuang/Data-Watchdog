@@ -280,7 +280,12 @@ namespace DataWatchdog
         {
             notifyMessage.Text = message;
             rebootBtn.Visible = showReboot;
-            var screen = Screen.AllScreens[0];
+            var screens = Screen.AllScreens;
+            Screen screen = null;
+            foreach (var s in screens.Where(s => s.Primary))
+            {
+                screen = s;
+            }
             Show();
             this.WindowState = FormWindowState.Normal;
             Left = screen.WorkingArea.Right - Width;
