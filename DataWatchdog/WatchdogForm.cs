@@ -96,7 +96,7 @@ namespace DataWatchdog
             }
             foreach (var driveName in driverList.Where(driveName => !VerifyOrdInitWatchFolder(driveName)))
             {
-                SoundAlarm(driveName);
+                SoundAlarm(driveName, true);
             }
             // Init folder watcher
             foreach (var driveName in driverList)
@@ -133,9 +133,9 @@ namespace DataWatchdog
             SoundAlarm(target);
         }
 
-        private void SoundAlarm(string target)
+        private void SoundAlarm(string target, bool ignoreAutoReboot = false)
         {
-            if (autoRebootMenuItem.Checked)
+            if (autoRebootMenuItem.Checked && !ignoreAutoReboot)
             {
                 ShowNotification($"{target} is infected!\r\nComputer will reboot after 10 secs!", false);
                 Reboot(10);
